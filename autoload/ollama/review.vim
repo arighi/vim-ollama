@@ -213,6 +213,7 @@ function! s:StartChat(lines) abort
     setlocal noswapfile
     setlocal modifiable
     setlocal wrap
+    setlocal tw=0
     let l:buf = bufnr('')
     let s:buf = l:buf
     let b:coc_enabled = 0 " disable CoC in chat buffer
@@ -276,12 +277,12 @@ endfunction
 
 " Create chat with code review prompt
 function! ollama#review#Review() range
-    call s:StartChatWithContext("Please review the following code:", a:firstline, a:lastline)
+    call s:StartChatWithContext("Please review the following code. Format your response to be readable from the terminal with lines not exceeding 75 characters. Do not mention this formatting requirement in your response:", a:firstline, a:lastline)
 endfunction
 
 " Create chat with spell checking prompt
 function! ollama#review#SpellCheck() range
-    call s:StartChatWithContext("Please review the following text for spelling errors and provide accurate corrections. Ensure that all words are spelled correctly, and make necessary adjustments to enhance the overall spelling accuracy of the text:", a:firstline, a:lastline)
+    call s:StartChatWithContext("Please review the following text for spelling errors and provide accurate corrections. Ensure that all words are spelled correctly, and make necessary adjustments to enhance the overall spelling accuracy of the text. Format your response to be readable from the terminal with lines not exceeding 75 characters. Do not mention this formatting requirement in your response:", a:firstline, a:lastline)
 endfunction
 
 " Create chat window with custom prompt

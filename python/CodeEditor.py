@@ -318,7 +318,7 @@ def create_prompt(template_name, request, preamble, code, postamble, ft) -> str:
     template_path = os.path.join(script_dir, "chat_templates", template_name)
     chat_template = ChatTemplate(template_path)
     chat = [
-            { "role": "system", "content": "You are a Vim code assistant plugin." },
+            { "role": "system", "content": "You are a Vim code assistant plugin. Format all code output to be readable from the terminal. Each line must not exceed 75 characters. Break long lines naturally at appropriate boundaries (e.g., after commas, operators, or logical breaks). Do not mention this formatting requirement or terminal readability in your responses." },
             { "role": "user", "content":
 f"""```{ft}
 {preamble}

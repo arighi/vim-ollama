@@ -152,11 +152,20 @@ async def main(provider, endpoint, model, options, systemprompt, timeout, creden
     multiline_input = False
     multiline_message = []
 
-    if systemprompt:
+    # Ensure systemprompt is initialized
+    if not systemprompt:
+        if provider == "ollama":
+            systemprompt = f"Today's date is {datetime.date.today().isoformat()}"
+        else:
+            systemprompt = ""
+    else:
         if provider == "ollama":
             # Let Ollama know the current date
-            systemprompt = f"Today's date is {datetime.date.today().isoformat()}"
-        conversation_history.append({"role": "system", "content": systemprompt})
+            systemprompt = f"Today's date is {datetime.date.today().isoformat()}\n\n{systemprompt}"
+
+    # Add formatting constraint to system prompt
+    systemprompt = f"{systemprompt}\n\nIMPORTANT: Format all responses to be readable from the terminal. Each line must not exceed 75 characters. Break long lines naturally at word boundaries. Do not mention this formatting requirement or terminal readability in your responses."
+    conversation_history.append({"role": "system", "content": systemprompt})
 
     while True:
         try:

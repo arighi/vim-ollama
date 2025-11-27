@@ -243,6 +243,9 @@ Rules:
 - Return only the exact code that fits between BEFORE and AFTER.
 - Do NOT add explanations or comments.
 - Output the missing code only.
+- Format code to be readable from the terminal with max 75 characters per line.
+- Break long lines naturally at appropriate boundaries.
+- Do NOT mention terminal readability or formatting requirements in output.
 
 Language: {lang}
 

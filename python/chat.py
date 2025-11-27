@@ -23,7 +23,7 @@ except ImportError:
 # Default values
 DEFAULT_PROVIDER = "ollama"
 DEFAULT_HOST = "http://localhost:11434"
-DEFAULT_TIMEOUT = 10
+DEFAULT_TIMEOUT = 600
 # Default models if missing
 DEFAULT_MODEL = "codellama:code"
 DEFAULT_OPENAI_MODEL = "gpt-4.1-mini"
@@ -54,7 +54,13 @@ async def stream_chat_message_ollama(messages, endpoint, model, options, timeout
     assistant_message = ""
 
     try:
-        async with httpx.AsyncClient(timeout=timeout) as client:
+        timeout_config = httpx.Timeout(
+            connect=DEFAULT_TIMEOUT,
+            read=DEFAULT_TIMEOUT,
+            write=DEFAULT_TIMEOUT,
+            pool=DEFAULT_TIMEOUT,
+        )
+        async with httpx.AsyncClient(timeout=timeout_config) as client:
             async with client.stream("POST", endpoint, headers=headers, json=data) as response:
                 if response.status_code == 200:
                     async for line in response.aiter_lines():

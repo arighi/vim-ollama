@@ -126,6 +126,15 @@ endif
 if !exists('g:ollama_chat_timeout')
     let g:ollama_chat_timeout = 10
 endif
+if !exists('g:ollama_chat_enable_commands')
+    " Command execution is disabled by default for security
+    let g:ollama_chat_enable_commands = 0
+endif
+if !exists('g:ollama_chat_confirm_commands')
+    " Command confirmation is disabled by default
+    " When enabled, prompts for y/n confirmation before executing each command
+    let g:ollama_chat_confirm_commands = 0
+endif
 " Code edit specific settings
 if !exists('g:ollama_edit_provider')
     " Provider for edit models: 'ollama' or 'openai'

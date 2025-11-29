@@ -74,21 +74,34 @@ function! s:StartChat(lines) abort
         " append lines
         let l:lines = split(a:msg, "\n")
         for l:line in l:lines
-            " when we received <EOT> start insert mode again
-            let l:idx = stridx(l:line, "<EOT>")
-            if l:idx != -1
-                call ollama#logger#Debug("idx=" .. l:idx)
-                let l:line = strpart(l:line, 0, l:idx)
+            " Check for markers that trigger insert mode: <EOT> or <PROMPT>
+            let l:eot_idx = stridx(l:line, "<EOT>")
+            let l:prompt_idx = stridx(l:line, "<PROMPT>")
+            let l:insert_mode_trigger = 0
+
+            " Handle <EOT> marker
+            if l:eot_idx != -1
+                call ollama#logger#Debug("EOT idx=" .. l:eot_idx)
+                let l:line = strpart(l:line, 0, l:eot_idx)
+                let l:insert_mode_trigger = 1
             endif
+
+            " Handle <PROMPT> marker (for confirmation prompts)
+            if l:prompt_idx != -1
+                call ollama#logger#Debug("PROMPT idx=" .. l:prompt_idx)
+                let l:line = strpart(l:line, 0, l:prompt_idx)
+                let l:insert_mode_trigger = 1
+            endif
+
             call appendbufline(s:buf, "$", l:line)
             if bufname() == s:ollama_bufname " Check if current active window is Ollama Chat
                 " check if in insert mode
                 if mode() == 'i'
-                    " start insert mode again
+                    " exit insert mode first
                     call feedkeys("\<Esc>")
                 endif
                 call feedkeys("G") "jump to end
-                if l:idx != -1
+                if l:insert_mode_trigger
                     " start insert mode
                     call feedkeys("a")
                 endif
@@ -165,6 +178,14 @@ function! s:StartChat(lines) abort
     if g:ollama_openai_credentialname != ''
          " add system prompt option
         let l:command += [ '-k', g:ollama_openai_credentialname ]
+    endif
+    " Add command execution flag if enabled
+    if exists('g:ollama_chat_enable_commands') && g:ollama_chat_enable_commands == 1
+        let l:command += [ '-c' ]
+        " Add confirmation flag if enabled
+        if exists('g:ollama_chat_confirm_commands') && g:ollama_chat_confirm_commands == 1
+            let l:command += [ '--confirm-commands' ]
+        endif
     endif
 
     " Redirect job's IO to buffer

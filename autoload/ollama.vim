@@ -127,8 +127,12 @@ function! ollama#Schedule()
     call s:KillTimer()
     let s:suggestion = ''
     call ollama#UpdatePreview(s:suggestion)
-    call ollama#logger#Debug("Scheduling debounce timer...")
-    let s:timer_id = timer_start(g:ollama_debounce_time, 'ollama#GetSuggestion')
+
+    " Only schedule a new completion if auto_trigger is enabled
+    if g:ollama_auto_trigger
+        call ollama#logger#Debug("Scheduling debounce timer...")
+        let s:timer_id = timer_start(g:ollama_debounce_time, 'ollama#GetSuggestion')
+    endif
 endfunction
 
 " handle output on stdout

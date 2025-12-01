@@ -189,6 +189,12 @@ Other Maps ~
                         if there is not visual selection.
 <Plug>(ollama-edit)
 
+                                                       *vim-ollama-leader_o*
+<leader>o               Manually trigger code completion (enters insert mode
+                        and triggers completion). Useful when
+                        g:ollama_auto_trigger is disabled.
+<Plug>(ollama-trigger-completion)
+
 <C-Y>                   Accept all changes.
 <Plug>(ollama-accept-all-changes)
 
@@ -355,6 +361,35 @@ g:ollama_debounce_time
     - Example:
 >
         let g:ollama_debounce_time = 300
+<
+                                                      *g:ollama_auto_trigger*
+g:ollama_auto_trigger
+    - Description: Controls whether code completions are triggered automatically
+      when idle in insert mode. When set to 1, completions are triggered
+      automatically after being idle for `g:ollama_debounce_time` milliseconds.
+      When set to 0, completions are only triggered manually.
+
+      This is useful if you prefer to have more control over when AI completions
+      appear, or if you want to reduce the number of API calls to paid services.
+
+      When disabled:
+      - Completions are only generated when manually triggered
+      - Ghost text is automatically dismissed when you type any key (except Tab,
+        Alt+Right, Alt+Ctrl+Right which accept the suggestion)
+      - No background AI calls are made unless you explicitly trigger them
+
+      Manual trigger options:
+      - In normal mode: `<leader>o` (default mapping)
+      - In insert mode: Custom mapping to `<Plug>(ollama-trigger-completion)`
+
+    - Default: 1 (enabled)
+    - Example:
+>
+        " Disable automatic triggering
+        let g:ollama_auto_trigger = 0
+
+        " Custom mapping for manual trigger in insert mode
+        imap <C-Space> <Plug>(ollama-trigger-completion)
 <
                                       *g:ollama_completion_allowlist_filetype*
 g:ollama_completion_allowlist_filetype

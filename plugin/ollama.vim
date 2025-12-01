@@ -71,6 +71,10 @@ endif
 if !exists('g:ollama_debounce_time')
     let g:ollama_debounce_time = 500
 endif
+if !exists('g:ollama_auto_trigger')
+    " Enable automatic triggering on idle (default: enabled for backward compatibility)
+    let g:ollama_auto_trigger = 1
+endif
 if !exists('g:ollama_completion_allowlist_filetype')
   let g:ollama_completion_allowlist_filetype = []
 endif
@@ -233,12 +237,14 @@ endfunction
 function! s:Init() abort
     call ollama#setup#Init()
     call s:MapTab()
-    if g:ollama_debounce_time > 0
-        augroup ollama_schedule
-            autocmd CursorMovedI  * if &buftype != 'prompt' | call ollama#Schedule() | endif
-            autocmd InsertLeave   * if &buftype != 'prompt' | call ollama#Dismiss() | endif
-        augroup END
-    endif
+    " Always set up autocmds to dismiss ghost text when typing
+    " When auto_trigger is enabled, Schedule() will also start a new completion
+    " When auto_trigger is disabled, Schedule() will only dismiss the ghost text
+    augroup ollama_schedule
+        autocmd!
+        autocmd CursorMovedI  * if &buftype != 'prompt' | call ollama#Schedule() | endif
+        autocmd InsertLeave   * if &buftype != 'prompt' | call ollama#Dismiss() | endif
+    augroup END
 endfunction
 
 " Create autocommand group
@@ -308,6 +314,11 @@ function! PluginInit() abort
         endif
         if empty(mapcheck('<leader>e', 'v'))
             vmap <leader>e <Plug>(ollama-edit)
+        endif
+        " Map <leader>o for manual completion trigger in normal mode
+        " (switches to insert mode and triggers completion)
+        if empty(mapcheck('<leader>o', 'n'))
+            nmap <leader>o a<Plug>(ollama-trigger-completion)
         endif
 
 "       These mappings are currently not used

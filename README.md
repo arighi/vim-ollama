@@ -171,6 +171,7 @@ The most important variables: (see `:help vim-ollama` for more information)
 | `g:ollama_model`      | `starcoder2:3b`         | The LLM for code completions.         |
 | `g:ollama_edit_model` | `qwen2.5-coder:7b`      | The LLM for code editing tasks.       |
 | `g:ollama_chat_model` | `llama3.1:8b`           | The LLM for chat conversations.       |
+| `g:ollama_auto_trigger` | `1`                   | Auto-trigger completion on idle (0=manual only). |
 
 When adding new unsupported code completion models, you will see an error like `ERROR - Config file .../python/configs/foobar.json not found.`. Simply add this missing file and create a merge request to get it included upstream. Consult the model's documentation to find out the correct tokens.
 
@@ -299,3 +300,32 @@ don't want to use the complete suggestion.
 To disable the default mappings, use `:Ollama config` and change `g:ollama_no_maps` and/or `g:ollama_no_tab_map`.
 
 See `:help vim-ollama` for more information.
+
+### Manual Completion Trigger
+
+By default, completions are triggered automatically after being idle for a short time (configurable with
+`g:ollama_debounce_time`). If you prefer to trigger completions manually instead, you can disable the automatic trigger:
+
+```vim
+" Disable automatic completion triggering
+let g:ollama_auto_trigger = 0
+```
+
+With this setting:
+- Completions will **only** be triggered when you explicitly request them
+- Ghost text is **automatically dismissed** when you type any key (except Tab/Alt+Right which accept the suggestion)
+- No background AI calls are made unless you manually trigger them
+
+**How to trigger completions:**
+- In **normal mode**: Press `<leader>o` (which enters insert mode and triggers completion)
+- In **insert mode**: Use the `<Plug>(ollama-trigger-completion)` mapping
+
+You can customize the normal mode mapping if desired:
+
+```vim
+" Custom mapping example: use <C-Space> in normal mode
+nmap <C-Space> a<Plug>(ollama-trigger-completion)
+
+" Or in insert mode
+imap <C-Space> <Plug>(ollama-trigger-completion)
+```
